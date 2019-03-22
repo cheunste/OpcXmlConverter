@@ -25,6 +25,8 @@ If you're executing this in another script, you will need the full path of the e
 
 The tagMap.csv is a csv file that maps a default windAGC XML tag to its respective OPC Tag.
 
+This file **must be in the same directory as the exe file**.
+
 This allows users to add or remove default tags to save to WindAGC by simply editing the csv file 
 
 - The left column is for **XML tags**
@@ -42,6 +44,7 @@ example:
 | PotenciaNominal	|.PotenciaNominal		|
 
 - **However** please note following:
-	- both XML and the OPC Tags are independent of the site name. The site name 
+	- Both XML and the OPC Tags are independent of the site name. The site name 
 	- In the OPC Tag section, all tags **MUST** start with a '.'
+	- There is no header in the tagMap.csv file
 
