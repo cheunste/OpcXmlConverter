@@ -12,12 +12,14 @@ Supposed to be designed with Wind Node (some internal tool) in mind.
 
 # How to use
 
-In powershell, type in the following (assuming you're in the same directory as the program)
+In powershell, type in the following (assuming you're in the same directory as the program). 
 
 ./OpcXmlConverter.exe [site name] [full path to xml]
 
 ex:
 ./OpcXmlConverter.exe JUNCA "D:\Program Files\IBERINCO\WINDAGC\DatosConfiguracion_NombreParque.xml"
+
+If you're executing this in another script, you will need the full path of the exe file instead.
 
 # TagMap
 
@@ -40,6 +42,6 @@ example:
 | PotenciaNominal	|.PotenciaNominal		|
 
 - **However** please note following:
-	- both XML and the OPC Tags are independent of the site name
-	- In the OPC Tag section, all tags **MUST** start with a `.
+	- both XML and the OPC Tags are independent of the site name. The site name 
+	- In the OPC Tag section, all tags **MUST** start with a '.'
 
