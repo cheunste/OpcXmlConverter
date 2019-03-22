@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Xml;
 using OpcLabs.BaseLib.Collections.Extensions;
 using OpcLabs.EasyOpc.DataAccess;
@@ -10,11 +12,21 @@ namespace OpcXmlConverter
     class Program
     {
 
+        private static String tagFile = "tagMap.csv";
+
         static void Main(string[] args)
         {
-            if (args.Length == 0)
+
+            //Checks to see if the arguments is exactly 2. If it is zero, then exist the program
+            if (args.Length != 2)
             {
                 Console.WriteLine("How to use: OpcXmlConverter.exe [site Abbrivation] [file path to XML] ");
+                return;
+            }
+
+            //Checks if the tagFile exists or not. Return if it doesn't exists 
+            if (!File.Exists(tagFile))
+            {
                 return;
             }
 
@@ -34,15 +46,17 @@ namespace OpcXmlConverter
 
             //This is a script that maps  the XML tag to OPC tags
             //Probably should be in some sort of config file so I don't have to recompile this everytime Victor makes a request
-            Dictionary<String, String> xmlOpcDict = new Dictionary<String, String>
-            {
-                { "AGC_ON",                     siteName+".WF.WAPC2_1.PlWAtv.actSt" },
-                { "AGC_MODO",                   siteName+".WF.WAPC2_1.PlWMod.actSt" },
-                { "SelectorConsigna",           siteName+".WF.WAPC2_1.PlWSrcAtv.actSt"},
-                { "DesactivarPF",               siteName+".WF.WAPC2_1.PlHzAtv.actSt"},
-                { "ModoPF",                     siteName+".WF.WAPC2_1.PlHzMod.actSt"},
-                { "PotenciaNominal",            siteName+".PotenciaNominal"}
-            };
+            Dictionary<String,String> xmlOpcDict = File.ReadLines(tagFile).Select(line => line.Split(',')).ToDictionary(line => line[0],line => siteName+line[1]);
+            
+            //Dictionary<String, String> xmlOpcDict = new Dictionary<String, String>
+            //{
+            //    { "AGC_ON",                     siteName+".WF.WAPC2_1.PlWAtv.actSt" },
+            //    { "AGC_MODO",                   siteName+".WF.WAPC2_1.PlWMod.actSt" },
+            //    { "SelectorConsigna",           siteName+".WF.WAPC2_1.PlWSrcAtv.actSt"},
+            //    { "DesactivarPF",               siteName+".WF.WAPC2_1.PlHzAtv.actSt"},
+            //    { "ModoPF",                     siteName+".WF.WAPC2_1.PlHzMod.actSt"},
+            //    { "PotenciaNominal",            siteName+".PotenciaNominal"}
+            //};
 
             //Loop through the dictionary and store all the keys into an arraylist. 
             //You'll need this array as comparison wwhen looping the XML tags
