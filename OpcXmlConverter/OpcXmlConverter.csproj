@@ -32,17 +32,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpcLabs.BaseLib, Version=5.54.1115.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1115\lib\net462\OpcLabs.BaseLib.dll</HintPath>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.6.1\lib\net45\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="OpcLabs.EasyOpcClassic, Version=5.54.1115.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1115\lib\net462\OpcLabs.EasyOpcClassic.dll</HintPath>
+    <Reference Include="OpcLabs.BaseLib, Version=5.54.1133.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1133\lib\net462\OpcLabs.BaseLib.dll</HintPath>
     </Reference>
-    <Reference Include="OpcLabs.EasyOpcUA, Version=5.54.1115.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1115\lib\net462\OpcLabs.EasyOpcUA.dll</HintPath>
+    <Reference Include="OpcLabs.EasyOpcClassic, Version=5.54.1133.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1133\lib\net462\OpcLabs.EasyOpcClassic.dll</HintPath>
+    </Reference>
+    <Reference Include="OpcLabs.EasyOpcUA, Version=5.54.1133.1, Culture=neutral, PublicKeyToken=6faddca41dacb409, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpcLabs.QuickOpc.5.54.1133\lib\net462\OpcLabs.EasyOpcUA.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using OpcLabs.BaseLib.Collections.Extensions;
+using NLog;
 using OpcLabs.EasyOpc.DataAccess;
 
 namespace OpcXmlConverter
@@ -12,6 +13,7 @@ namespace OpcXmlConverter
     class Program
     {
 
+        //tagFile is a mandatory csv that is used to map OPC tag to the XML tag in the Wind NOde XML
         private static String tagFile = "tagMap.csv";
 
         static void Main(string[] args)
@@ -20,7 +22,7 @@ namespace OpcXmlConverter
             //Checks to see if the arguments is exactly 2. If it is zero, then exist the program
             if (args.Length != 2)
             {
-                Console.WriteLine("How to use: OpcXmlConverter.exe [site Abbrivation] [file path to XML] ");
+                Console.WriteLine("How to use: OpcXmlConverter.exe [site Abbrivation] [file path to XML] [save/read]");
                 return;
             }
 
@@ -30,33 +32,20 @@ namespace OpcXmlConverter
                 return;
             }
 
-            //Get the siteName from the argument
+            //Get the siteName, filePath (of the AGC XML) and the "save/read" option from the argument
             String siteName = args[0];
-            //"C:\\Users\\Stephen\\Documents\\OPCPowershell\\AGC.xml";
             String filePath = args[1];
+            String option = args[2].ToLower();
 
-            // Create an OPC client
+
+            //Create member variables
+            // Create an OPC client instance and set it to the server
             var client = new EasyDAClient();
-            //The OPC server name. In my experience, this is consistent for all sites
             String opcServer = "SV.OPCDAServer.1";
-
-
             //Create an arrayList for quick access
             ArrayList xmlArrayList = new ArrayList();
-
-            //This is a script that maps  the XML tag to OPC tags
-            //Probably should be in some sort of config file so I don't have to recompile this everytime Victor makes a request
-            Dictionary<String,String> xmlOpcDict = File.ReadLines(tagFile).Select(line => line.Split(',')).ToDictionary(line => line[0],line => siteName+line[1]);
-            
-            //Dictionary<String, String> xmlOpcDict = new Dictionary<String, String>
-            //{
-            //    { "AGC_ON",                     siteName+".WF.WAPC2_1.PlWAtv.actSt" },
-            //    { "AGC_MODO",                   siteName+".WF.WAPC2_1.PlWMod.actSt" },
-            //    { "SelectorConsigna",           siteName+".WF.WAPC2_1.PlWSrcAtv.actSt"},
-            //    { "DesactivarPF",               siteName+".WF.WAPC2_1.PlHzAtv.actSt"},
-            //    { "ModoPF",                     siteName+".WF.WAPC2_1.PlHzMod.actSt"},
-            //    { "PotenciaNominal",            siteName+".PotenciaNominal"}
-            //};
+            //reads from the xmlMap.csv file and turns it into a dictionary where all the XML tags are stored as keys and Opc tags are stored as values
+            Dictionary<String, String> xmlOpcDict = File.ReadLines(tagFile).Select(line => line.Split(',')).ToDictionary(line => line[0], line => siteName + line[1]);
 
             //Loop through the dictionary and store all the keys into an arraylist. 
             //You'll need this array as comparison wwhen looping the XML tags
@@ -65,10 +54,12 @@ namespace OpcXmlConverter
                 xmlArrayList.Add(tag.Key);
             }
 
-            //Load the XML documentation
+
+            //Load the AGC XML documentation
             XmlDocument doc = new XmlDocument();
             doc.Load(filePath);
-            //Because the XML uses a namespace, you need to handle it
+
+            //Because the XML uses a namespace, you need to handle it with a NamespaceManager
             XmlNamespaceManager nsmgr = new XmlNamespaceManager(doc.NameTable);
             nsmgr.AddNamespace("df", "http://tempuri.org/dtsConfigurac.xsd");
 
@@ -80,7 +71,6 @@ namespace OpcXmlConverter
             {
                 Console.WriteLine("xmlTag={0}, opcTag={1}", tag.Key, tag.Value);
             }
-
 
             /*
              * Loop through all the XML tags in the default parameter section.
@@ -100,43 +90,62 @@ namespace OpcXmlConverter
                     //Log the exception 
                     try
                     {
+                        //Value is the value fetched from the XML
                         object value;
                         value = client.ReadItemValue("", opcServer, xmlOpcDict[nodeName]);
                         Console.WriteLine("opcServer: " + opcServer + "\n nodeName: " + nodeName + "\nxmlopcDict: " + xmlOpcDict[nodeName]);
+
                         if (value != null)
                         {
                             // Read item value and display it in a message box
                             Console.WriteLine(value.ToString());
-                            String xmlValue;
-                            //Hanlde the cases differently if the values read from the OPC tags are boolean
-                            if (value.ToString().ToLower().Equals("true"))
-                            {
-                                xmlValue = "1";
-                            }
-                            else if (value.ToString().ToLower().Equals("false"))
-                            {
-                                xmlValue = "0";
-                            }
-                            else
-                            {
-                                //Write the value to the XML. Uncomment once you're ready
-                                xmlValue = value.ToString();
-                            }
-                            Console.WriteLine("Node value: " + node.Value + "\nxmlValue: " + xmlValue);
-                            Console.WriteLine("Node Inner text: " + node.InnerText);
-                            node.InnerText = xmlValue;
 
+                            //If the user decides to save to the XML
+                            if (option.Equals("save"))
+                            {
+                                String xmlValue;
+                                //Hanlde the cases differently if the values read from the OPC tags are boolean
+                                // Probably should be in a tenary statement, but I'm feeling lazy
+                                if (value.ToString().ToLower().Equals("true"))
+                                {
+                                    xmlValue = "1";
+                                }
+                                else if (value.ToString().ToLower().Equals("false"))
+                                {
+                                    xmlValue = "0";
+                                }
+                                else
+                                {
+                                    //Write the value to the XML. Uncomment once you're ready
+                                    xmlValue = value.ToString();
+                                }
+                                Console.WriteLine("Node value: " + node.Value + "\nxmlValue: " + xmlValue);
+                                Console.WriteLine("Node Inner text: " + node.InnerText);
+                                node.InnerText = xmlValue;
+                            }
+
+                            //If the user only wants to read from the XML
+                            else if (option.Equals("read"))
+                            {
+                                //prints the OPC tag and its default value 
+                                Console.WriteLine("OPC Tag: "+xmlOpcDict[nodeName] + " default: "+node.InnerText);
+                                /* TODO: 
+                                 * Wait until Victor gives you the tags to write the default settings to
+                                 * Then write to them. You may need to update the tagMap.csv file with the new tags given
+                                 */
+                            }
                         }
                     }
                     catch (Exception e)
                     {
-                        //Probably should be logging this, if you ever figure it out
                         Console.WriteLine(e);
                     }
                 }
             }
-            //Save the xml
-            doc.Save(filePath);
+
+            //Save the xml...but only if option is save
+            if (option.Equals("save"))
+                doc.Save(filePath);
         }
     }
 }
