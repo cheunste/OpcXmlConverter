@@ -101,16 +101,25 @@ namespace OpcXmlConverter
                     try
                     {
                         //Value is the value fetched from the XML
-                        object value;
-                        value = client.ReadItemValue("", opcServerName, xmlOpcDict[nodeName]);
+                        object value = client;
+                        //value = client.ReadItemValue("", opcServerName, xmlOpcDict[nodeName]);
+                        try
+                        {
+                            value = client.ReadItemValue("", opcServerName, xmlOpcDict[nodeName]);
+                        }
+                        catch (Exception e)
+                        {
+                            log.ErrorFormat("Tag {0} cannot be read from {1}", xmlOpcDict[nodeName], opcServerName);
+                            log.ErrorFormat("Error: {0}", e);
+                        }
                         Console.WriteLine("opcServer: " + opcServerName + " nodeName: " + nodeName + " xmlopcDict: " + xmlOpcDict[nodeName]);
-                        log.InfoFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}",opcServerName,nodeName,xmlOpcDict[nodeName]);
+                        log.InfoFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}", opcServerName, nodeName, xmlOpcDict[nodeName]);
 
                         if (value != null)
                         {
                             // Read item value and display it 
                             Console.WriteLine(value.ToString());
-                            log.InfoFormat("tag: {0} value: {1}",xmlOpcDict[nodeName],value.ToString());
+                            log.InfoFormat("tag: {0} value: {1}", xmlOpcDict[nodeName], value.ToString());
 
                             //If the user write from the OPC tag to the XML
                             if (option.Equals("save"))
@@ -134,8 +143,8 @@ namespace OpcXmlConverter
                                 Console.WriteLine("Node value: " + node.Value + "\nxmlValue: " + xmlValue);
                                 Console.WriteLine("Node Inner text: " + node.InnerText);
 
-                                log.InfoFormat("Node value: {0} xmlValue: {1}",node.Value,xmlValue);
-                                log.InfoFormat("Node Inner text: {0}" , node.InnerText);
+                                log.InfoFormat("Node value: {0} xmlValue: {1}", node.Value, xmlValue);
+                                log.InfoFormat("Node Inner text: {0}", node.InnerText);
                                 node.InnerText = xmlValue;
                             }
 
@@ -143,23 +152,27 @@ namespace OpcXmlConverter
                             else if (option.Equals("read"))
                             {
                                 //prints the OPC tag and its default value 
-                                Console.WriteLine("OPC Tag: "+xmlOpcDict[nodeName] + " default: "+node.InnerText);
-                                log.InfoFormat("Writing {0} to {1}",node.InnerText,xmlOpcDict[nodeName]);
+                                Console.WriteLine("OPC Tag: " + xmlOpcDict[nodeName] + " default: " + node.InnerText);
+                                log.InfoFormat("Writing {0} to {1}", node.InnerText, xmlOpcDict[nodeName]);
 
-                                client.WriteItemValue(opcServerName,xmlOpcDict[nodeName],node.InnerText);
+                                try
+                                {
+                                    client.WriteItemValue(opcServerName, xmlOpcDict[nodeName], node.InnerText);
+                                }
+                                catch (Exception e)
+                                {
+                                    log.ErrorFormat("Cannot write {0} to tag {1} cannot be written to {2}", node.InnerText,xmlOpcDict[nodeName], opcServerName);
+                                    log.ErrorFormat("Error: {0}", e);
+                                }
 
                                 //Reads from the XML and writes to the custom tags that victor set up
-                                /* TODO: 
-                                 * Wait until Victor gives you the tags to write the default settings to
-                                 * Then write to them. You may need to update the tagMap.csv file with the new tags given
-                                 */
                             }
                         }
                     }
                     catch (Exception e)
                     {
                         log.ErrorFormat("Error Logged. Is the OPC server up?");
-                        log.ErrorFormat(" Error: \n {0}",e);
+                        log.ErrorFormat(" Error: \n {0}", e);
                         Console.WriteLine(e);
                     }
                 }
