@@ -1,0 +1,6 @@
+AGC_ON,.AGCDEF.WF.WAPC2_1.PlWAtv.actSt
+AGC_MODO,.AGCDEF.WF.WAPC2_1.PlWMod.actSt
+SelectorConsigna,.AGCDEF.WF.WAPC2_1.PlWSrcAtv.actSt
+DesactivarPF,.AGCDEF.WF.WAPC2_1.PlHzAtv.actSt
+ModoPF,.AGCDEF.WF.WAPC2_1.PlHzMod.actSt
+PotenciaNominal,.AGCDEF.PotenciaNominal

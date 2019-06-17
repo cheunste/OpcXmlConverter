@@ -5,30 +5,35 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using OpcLabs.BaseLib.Collections.Extensions;
-using NLog;
+using log4net;
 using OpcLabs.EasyOpc.DataAccess;
 
 namespace OpcXmlConverter
 {
     class Program
     {
+        //Logger
+        private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+
 
         //tagFile is a mandatory csv that is used to map OPC tag to the XML tag in the Wind NOde XML
-        private static String tagFile = "tagMap.csv";
+        private static String tagFile = @"./tagMap.csv";
 
         static void Main(string[] args)
         {
 
             //Checks to see if the arguments is exactly 2. If it is zero, then exist the program
-            if (args.Length != 2)
+            if (args.Length != 3)
             {
                 Console.WriteLine("How to use: OpcXmlConverter.exe [site Abbrivation] [file path to XML] [save/read]");
+                log.InfoFormat("Not Enough arguments");
                 return;
             }
 
             //Checks if the tagFile exists or not. Return if it doesn't exists 
             if (!File.Exists(tagFile))
             {
+                log.ErrorFormat("The tagMap.csv file doesn't exist in the current directory");
                 return;
             }
 
@@ -41,7 +46,7 @@ namespace OpcXmlConverter
             //Create member variables
             // Create an OPC client instance and set it to the server
             var client = new EasyDAClient();
-            String opcServer = "SV.OPCDAServer.1";
+            String opcServerName = "SV.OPCDAServer.1";
             //Create an arrayList for quick access
             ArrayList xmlArrayList = new ArrayList();
             //reads from the xmlMap.csv file and turns it into a dictionary where all the XML tags are stored as keys and Opc tags are stored as values
@@ -70,6 +75,7 @@ namespace OpcXmlConverter
             foreach (KeyValuePair<String, String> tag in xmlOpcDict)
             {
                 Console.WriteLine("xmlTag={0}, opcTag={1}", tag.Key, tag.Value);
+                log.InfoFormat("xmlTag={0}, opcTag={1}", tag.Key, tag.Value);
             }
 
             /*
@@ -81,6 +87,7 @@ namespace OpcXmlConverter
             {
                 String nodeName = node.Name;
                 Console.WriteLine("XML node name: " + nodeName);
+                log.InfoFormat("XML node name: {0}", nodeName);
                 if (xmlArrayList.Contains(nodeName))
                 {
                     //Write to output the key of the xmlOPCDict. YOu should replace this with logging in the furture
@@ -92,15 +99,17 @@ namespace OpcXmlConverter
                     {
                         //Value is the value fetched from the XML
                         object value;
-                        value = client.ReadItemValue("", opcServer, xmlOpcDict[nodeName]);
-                        Console.WriteLine("opcServer: " + opcServer + "\n nodeName: " + nodeName + "\nxmlopcDict: " + xmlOpcDict[nodeName]);
+                        value = client.ReadItemValue("", opcServerName, xmlOpcDict[nodeName]);
+                        Console.WriteLine("opcServer: " + opcServerName + "\n nodeName: " + nodeName + "\nxmlopcDict: " + xmlOpcDict[nodeName]);
+                        log.InfoFormat("opcServer: {0} \n nodeName: {1} \nxmlopcDict: {2}",opcServerName,nodeName,xmlOpcDict[nodeName]);
 
                         if (value != null)
                         {
-                            // Read item value and display it in a message box
+                            // Read item value and display it 
                             Console.WriteLine(value.ToString());
+                            log.InfoFormat("tag: {0} value: {1}",xmlOpcDict[nodeName],value.ToString());
 
-                            //If the user decides to save to the XML
+                            //If the user write from the OPC tag to the XML
                             if (option.Equals("save"))
                             {
                                 String xmlValue;
@@ -121,14 +130,22 @@ namespace OpcXmlConverter
                                 }
                                 Console.WriteLine("Node value: " + node.Value + "\nxmlValue: " + xmlValue);
                                 Console.WriteLine("Node Inner text: " + node.InnerText);
+
+                                log.InfoFormat("Node value: {0} \nxmlValue: {1}",node.Value,xmlValue);
+                                log.InfoFormat("Node Inner text: {0}" , node.InnerText);
                                 node.InnerText = xmlValue;
                             }
 
-                            //If the user only wants to read from the XML
+                            //If the user only wants to read from the XML and write to the default OPC tags
                             else if (option.Equals("read"))
                             {
                                 //prints the OPC tag and its default value 
                                 Console.WriteLine("OPC Tag: "+xmlOpcDict[nodeName] + " default: "+node.InnerText);
+                                log.InfoFormat("Writing {0} to {1}",node.InnerText,xmlOpcDict[nodeName]);
+
+                                client.WriteItemValue(opcServerName,xmlOpcDict[nodeName],node.InnerText);
+
+                                //Reads from the XML and writes to the custom tags that victor set up
                                 /* TODO: 
                                  * Wait until Victor gives you the tags to write the default settings to
                                  * Then write to them. You may need to update the tagMap.csv file with the new tags given
@@ -138,6 +155,8 @@ namespace OpcXmlConverter
                     }
                     catch (Exception e)
                     {
+                        log.ErrorFormat("Error Logged. Is the OPC server up?");
+                        log.ErrorFormat(" Error: \n {0}",e);
                         Console.WriteLine(e);
                     }
                 }
