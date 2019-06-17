@@ -22,6 +22,9 @@ namespace OpcXmlConverter
         static void Main(string[] args)
         {
 
+            //Initialize log4net
+            log4net.Config.XmlConfigurator.Configure();
+
             //Checks to see if the arguments is exactly 2. If it is zero, then exist the program
             if (args.Length != 3)
             {
@@ -87,7 +90,7 @@ namespace OpcXmlConverter
             {
                 String nodeName = node.Name;
                 Console.WriteLine("XML node name: " + nodeName);
-                log.InfoFormat("XML node name: {0}", nodeName);
+                log.DebugFormat("XML node name: {0}", nodeName);
                 if (xmlArrayList.Contains(nodeName))
                 {
                     //Write to output the key of the xmlOPCDict. YOu should replace this with logging in the furture
@@ -100,8 +103,8 @@ namespace OpcXmlConverter
                         //Value is the value fetched from the XML
                         object value;
                         value = client.ReadItemValue("", opcServerName, xmlOpcDict[nodeName]);
-                        Console.WriteLine("opcServer: " + opcServerName + "\n nodeName: " + nodeName + "\nxmlopcDict: " + xmlOpcDict[nodeName]);
-                        log.InfoFormat("opcServer: {0} \n nodeName: {1} \nxmlopcDict: {2}",opcServerName,nodeName,xmlOpcDict[nodeName]);
+                        Console.WriteLine("opcServer: " + opcServerName + " nodeName: " + nodeName + " xmlopcDict: " + xmlOpcDict[nodeName]);
+                        log.InfoFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}",opcServerName,nodeName,xmlOpcDict[nodeName]);
 
                         if (value != null)
                         {
@@ -131,7 +134,7 @@ namespace OpcXmlConverter
                                 Console.WriteLine("Node value: " + node.Value + "\nxmlValue: " + xmlValue);
                                 Console.WriteLine("Node Inner text: " + node.InnerText);
 
-                                log.InfoFormat("Node value: {0} \nxmlValue: {1}",node.Value,xmlValue);
+                                log.InfoFormat("Node value: {0} xmlValue: {1}",node.Value,xmlValue);
                                 log.InfoFormat("Node Inner text: {0}" , node.InnerText);
                                 node.InnerText = xmlValue;
                             }
@@ -164,7 +167,10 @@ namespace OpcXmlConverter
 
             //Save the xml...but only if option is save
             if (option.Equals("save"))
+            {
                 doc.Save(filePath);
+                log.InfoFormat("XML Saved!");
+            }
         }
     }
 }

@@ -64,7 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Log4Net.config" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <EmbeddedResource Include="tagMap.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
