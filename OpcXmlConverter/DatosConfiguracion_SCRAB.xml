@@ -588,5 +588,6 @@
     <ModoPF>0</ModoPF>  <!--0=Normal, 1=Reseteo -->
     <TensionNominal>115</TensionNominal>
     <MargenErrorAero>1.5</MargenErrorAero>
+	<PotenciaNominal>123123</PotenciaNominal>
   </ValoresIniciales>
 </dtsConfiguracion>

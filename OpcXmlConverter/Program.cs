@@ -91,6 +91,7 @@ namespace OpcXmlConverter
                 String nodeName = node.Name;
                 Console.WriteLine("XML node name: " + nodeName);
                 log.DebugFormat("XML node name: {0}", nodeName);
+                log.InfoFormat("XML node name: {0}", nodeName);
                 if (xmlArrayList.Contains(nodeName))
                 {
                     //Write to output the key of the xmlOPCDict. YOu should replace this with logging in the furture
