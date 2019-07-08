@@ -19,6 +19,10 @@ namespace OpcXmlConverter
         //tagFile is a mandatory csv that is used to map OPC tag to the XML tag in the Wind NOde XML
         private static String tagFile = @"./tagMap.csv";
 
+        /**
+         * 
+         * args: sitePrefix, path to XML, save/read
+         */
         static void Main(string[] args)
         {
 
