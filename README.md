@@ -14,10 +14,10 @@ Supposed to be designed with Wind Node (some internal tool) in mind.
 
 In powershell, type in the following (assuming you're in the same directory as the program). 
 
-./OpcXmlConverter.exe [site name] [full path to xml]
+./OpcXmlConverter.exe [site name] [full path to xml] [save/read]
 
 ex:
-./OpcXmlConverter.exe JUNCA "D:\Program Files\IBERINCO\WINDAGC\DatosConfiguracion_NombreParque.xml"
+./OpcXmlConverter.exe TESTSITE "D:\Program Files\IBERINCO\WINDAGC\DatosConfiguracion_XXXXXXXXX.xml"
 
 If you're executing this in another script, you will need the full path of the exe file instead.
 
@@ -36,12 +36,12 @@ example:
 
 | XML Tag		|OPC Tag			|
 | --- | --- |
-| AGC_ON		|.WF.WAPC2_1.PlWAtv.actSt	|
-| AGC_MODO		|.WF.WAPC2_1.PlWMod.actSt	|
-| SelectorConsigna	|.WF.WAPC2_1.PlWSrcAtv.actSt	|
-| DesactivarPF		|.WF.WAPC2_1.PlHzAtv.actSt	|
-| ModoPF		|.WF.WAPC2_1.PlHzMod.actSt	|
-| PotenciaNominal	|.PotenciaNominal		|
+| AGC_ON		|.WF.AGCDEF.PlWAtv.actSt	|
+| AGC_MODO		|.WF.AGCDEF.PlWMod.actSt	|
+| SelectorConsigna	|.WF.AGCDEF.PlWSrcAtv.actSt	|
+| DesactivarPF		|.WF.AGCDEF.PlHzAtv.actSt	|
+| ModoPF		|.WF.AGCDEF.PlHzMod.actSt	|
+| PotenciaNominal	|.WF.AGCDEF.PotenciaNominal		|
 
 - **However** please note following:
 	- Both XML and the OPC Tags are independent of the site name. The site name 
