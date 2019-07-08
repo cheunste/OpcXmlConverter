@@ -27,7 +27,7 @@ namespace OpcXmlConverter
         {
 
             //Initialize log4net
-            log4net.Config.XmlConfigurator.Configure();
+            //log4net.Config.XmlConfigurator.Configure(new FileInfo(".\log4c.config"));
 
             //Checks to see if the arguments is exactly 2. If it is zero, then exist the program
             if (args.Length != 3)
