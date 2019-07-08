@@ -1,1 +1,1 @@
-./OpcXmlConverter.exe "[SITE PREFIX]" "[FULL PATH TO XML]" "read"
+OpcXmlConverter.exe "SCRAB" "DatosConfiguracion_SCRAB.xml" "read"
