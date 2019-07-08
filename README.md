@@ -44,7 +44,7 @@ example:
 | PotenciaNominal	|.WF.AGCDEF.PotenciaNominal		|
 
 - **However** please note following:
-	- Both XML and the OPC Tags are independent of the site name. The site name 
+	- Both XML and the OPC Tags are independent of the site name. The site name is added as a parameter input
 	- In the OPC Tag section, all tags **MUST** start with a '.'
-	- There is no header in the tagMap.csv file
+	- There is no header in the tagMap.csv file (that means don't add the "XML Tag" and "OPC Tag" to the tagMap.csv)
 
