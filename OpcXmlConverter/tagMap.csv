@@ -1,6 +1,6 @@
-AGC_ON,WF.AGCDEF.PlWAtv.actSt
-AGC_MODO,WF.AGCDEF.PlWMod.actSt
-SelectorConsigna,WF.AGCDEF.PlWSrcAtv.actSt
-DesactivarPF,WF.AGCDEF.PlHzAtv.actSt
-ModoPF,WF.AGCDEF.PlHzMod.actSt
+AGC_ON,.WF.AGCDEF.PlWAtv.actSt
+AGC_MODO,.WF.AGCDEF.PlWMod.actSt
+SelectorConsigna,.WF.AGCDEF.PlWSrcAtv.actSt
+DesactivarPF,.WF.AGCDEF.PlHzAtv.actSt
+ModoPF,.WF.AGCDEF.PlHzMod.actSt
 PotenciaNominal,.WF.AGCDEF.PotenciaNominal
