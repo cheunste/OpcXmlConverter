@@ -19,14 +19,15 @@ namespace OpcXmlConverter
         private static String opcServerName = "SV.OPCDAServer.1";
         private static readonly int CORRECT_ARGUMENT_LENGTH = 3;
         private static EasyDAClient client;
+        private static XmlDocument uccAgcXmlFile;
 
         /**
-         * args: sitePrefix, path to XML, save/read
+         * args: sitePrefix, path to XML, (write)ToAgcXml/(read)FromAgcXml
          */
         static void Main(string[] args)
         {
 #if DEBUG
-            args = new[] { "SCRAB", "./DatosConfiguracion_SCRAB.xml", "read" };
+            args = new[] { "SCRAB", "./DatosConfiguracion_SCRAB.xml", "write" };
 #endif
             String siteName = args[0];
             String uccXmlFilePath = args[1];
@@ -35,16 +36,7 @@ namespace OpcXmlConverter
             client = new EasyDAClient();
             object valueFromXmlFile = null;
 
-            if (args.Length != CORRECT_ARGUMENT_LENGTH)
-            {
-                log.InfoFormat("Not Enough arguments");
-                return;
-            }
-            if (!File.Exists(OpcTagCsvFile))
-            {
-                log.ErrorFormat("The file tagMap.csv doesn't exist in the current directory. Cannot run without it.");
-                return;
-            }
+            if (!PrereqMet(args.Length, OpcTagCsvFile)) return;
 
             //reads from the xmlMap.csv file and turns it into a dictionary where all the XML tags are stored as keys and Opc tags are stored as values
             //Then store the store all the xml element into an arraylist for easier access
@@ -70,10 +62,10 @@ namespace OpcXmlConverter
                 Console.WriteLine("XML node name: " + agcXmlElementName);
                 log.DebugFormat("XML node name: {0}", agcXmlElementName);
                 log.InfoFormat("XML node name: {0}", agcXmlElementName);
-                string opcTagInXmlFile = xmlOpcDict[agcXmlElementName];
 
                 if (agcXmlElementList.Contains(agcXmlElementName))
                 {
+                    string opcTagInXmlFile = xmlOpcDict[agcXmlElementName];
                     valueFromXmlFile = readElementValueFromXmlFile(opcTagInXmlFile);
                     log.InfoFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}", opcServerName, agcXmlElementName, opcTagInXmlFile);
 
@@ -84,7 +76,7 @@ namespace OpcXmlConverter
                         log.InfoFormat("tag: {0} value: {1}", opcTagInXmlFile, valueFromXmlFile.ToString());
 
                         //If the user write from the OPC tag to the XML
-                        if (option.Equals("save"))
+                        if (option.Equals("write"))
                             writeToXmlFile(valueFromXmlFile, element);
 
                         //If the user only wants to read from the XML and write to the default OPC tags
@@ -94,9 +86,12 @@ namespace OpcXmlConverter
                 }
             }
 
-            if (option.Equals("save"))
-                saveXml(uccAgcXmlFile, uccXmlFilePath);
+            if (option.Equals("write"))
+                saveSettingsToXmlFile(uccAgcXmlFile, uccXmlFilePath);
         }
+
+        private static bool PrereqMet(int length, string opcTagCsvFile) =>
+            (length != CORRECT_ARGUMENT_LENGTH || !File.Exists(OpcTagCsvFile)) ? false : true;
 
         private static void verifyElementsInXmlOpcDict(Dictionary<string, string> xmlOpcDict)
         {
@@ -139,10 +134,9 @@ namespace OpcXmlConverter
 
         public static void readFromXmlFile(String agcOpcTag, XmlNode node, EasyDAClient client)
         {
-            log.InfoFormat("Writing {0} to {1}", node.InnerText, agcOpcTag);
-
             try
             {
+                log.InfoFormat("Writing {0} to {1}", node.InnerText, agcOpcTag);
                 client.WriteItemValue(opcServerName, agcOpcTag, node.InnerText);
             }
             catch (Exception e)
@@ -151,7 +145,7 @@ namespace OpcXmlConverter
                 log.ErrorFormat("Error: {0}", e);
             }
         }
-        public static void saveXml(XmlDocument uccAgcXmlFile, String uccXmlFilePath)
+        public static void saveSettingsToXmlFile(XmlDocument uccAgcXmlFile, String uccXmlFilePath)
         {
             uccAgcXmlFile.Save(uccXmlFilePath);
             log.InfoFormat("XML Saved!");
