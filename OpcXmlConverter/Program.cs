@@ -18,8 +18,6 @@ namespace OpcXmlConverter
         private static String OpcTagCsvFile = @"./tagMap.csv";
         private static String opcServerName = "SV.OPCDAServer.1";
         private static readonly int CORRECT_ARGUMENT_LENGTH = 3;
-        private static EasyDAClient client;
-        private static XmlDocument uccAgcXmlFile;
 
         /**
          * args: sitePrefix, path to XML, (write)ToAgcXml/(read)FromAgcXml
@@ -27,13 +25,12 @@ namespace OpcXmlConverter
         static void Main(string[] args)
         {
 #if DEBUG
-            args = new[] { "SCRAB", "./DatosConfiguracion_SCRAB.xml", "write" };
+            args = new[] { "HOOSA", "./DatosConfiguracion_SCRAB.xml", "read" };
 #endif
             String siteName = args[0];
             String uccXmlFilePath = args[1];
             String option = args[2].ToLower();
             ArrayList agcXmlElementList = new ArrayList();
-            client = new EasyDAClient();
             object valueFromXmlFile = null;
 
             if (!PrereqMet(args.Length, OpcTagCsvFile)) return;
@@ -59,29 +56,24 @@ namespace OpcXmlConverter
             foreach (XmlNode element in xmlNodeList)
             {
                 String agcXmlElementName = element.Name;
-                Console.WriteLine("XML node name: " + agcXmlElementName);
-                log.DebugFormat("XML node name: {0}", agcXmlElementName);
-                log.InfoFormat("XML node name: {0}", agcXmlElementName);
-
                 if (agcXmlElementList.Contains(agcXmlElementName))
                 {
                     string opcTagInXmlFile = xmlOpcDict[agcXmlElementName];
                     valueFromXmlFile = readElementValueFromXmlFile(opcTagInXmlFile);
-                    log.InfoFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}", opcServerName, agcXmlElementName, opcTagInXmlFile);
+                    log.DebugFormat("opcServer: {0} nodeName: {1} xmlopcDict: {2}", opcServerName, agcXmlElementName, opcTagInXmlFile);
 
                     if (valueFromXmlFile != null)
                     {
                         // Read item value and display it 
-                        Console.WriteLine(valueFromXmlFile.ToString());
                         log.InfoFormat("tag: {0} value: {1}", opcTagInXmlFile, valueFromXmlFile.ToString());
 
                         //If the user write from the OPC tag to the XML
                         if (option.Equals("write"))
-                            writeToXmlFile(valueFromXmlFile, element);
+                            ReadFromOpcTagWriteToXmlFile(valueFromXmlFile, element);
 
                         //If the user only wants to read from the XML and write to the default OPC tags
                         else if (option.Equals("read"))
-                            readFromXmlFile(opcTagInXmlFile, element, client);
+                            ReadFromXmlFileWriteToOpcTag(opcTagInXmlFile, element);
                     }
                 }
             }
@@ -96,28 +88,23 @@ namespace OpcXmlConverter
         private static void verifyElementsInXmlOpcDict(Dictionary<string, string> xmlOpcDict)
         {
             foreach (KeyValuePair<String, String> element in xmlOpcDict)
-            {
-                Console.WriteLine("xmlTag={0}, opcTag={1}", element.Key, element.Value);
                 log.InfoFormat("xmlTag={0}, opcTag={1}", element.Key, element.Value);
-            }
         }
 
         private static object readElementValueFromXmlFile(string opcTagInXmlFile)
         {
             //Value is the value fetched from the XML
-            try
-            {
-                return client.ReadItemValue("", opcServerName, opcTagInXmlFile);
+            try {
+                return OpcServer.ReadTag(opcServerName, opcTagInXmlFile);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 log.ErrorFormat("Tag {0} cannot be read from {1}", opcTagInXmlFile, opcServerName);
                 log.ErrorFormat("Error: {0}", e);
                 return null;
             }
         }
 
-        public static void writeToXmlFile(object valueFromXmlFile, XmlNode node)
+        public static void ReadFromOpcTagWriteToXmlFile(object valueFromXmlFile, XmlNode node)
         {
             String xmlValue;
             //Hanlde the cases differently if the values read from the OPC tags are boolean. Otherwise, it won't be a boolean and will be a regular string.
@@ -132,12 +119,12 @@ namespace OpcXmlConverter
             node.InnerText = xmlValue;
         }
 
-        public static void readFromXmlFile(String agcOpcTag, XmlNode node, EasyDAClient client)
+        public static void ReadFromXmlFileWriteToOpcTag(String agcOpcTag, XmlNode node)
         {
             try
             {
                 log.InfoFormat("Writing {0} to {1}", node.InnerText, agcOpcTag);
-                client.WriteItemValue(opcServerName, agcOpcTag, node.InnerText);
+                OpcServer.WriteTag(opcServerName, agcOpcTag, node.InnerText);
             }
             catch (Exception e)
             {
