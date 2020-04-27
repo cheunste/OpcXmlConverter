@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using OpcLabs.BaseLib.Collections.Extensions;
 using log4net;
-using OpcLabs.EasyOpc.DataAccess;
 
 namespace OpcXmlConverter
 {
@@ -33,7 +31,11 @@ namespace OpcXmlConverter
             ArrayList agcXmlElementList = new ArrayList();
             object valueFromXmlFile = null;
 
-            if (!PrereqMet(args.Length, OpcTagCsvFile)) return;
+            if (!PrereqMet(args.Length, OpcTagCsvFile))
+            {
+                log.Error("Not enough args or  can't find the csvFile");
+                return;
+            }
 
             //reads from the xmlMap.csv file and turns it into a dictionary where all the XML tags are stored as keys and Opc tags are stored as values
             //Then store the store all the xml element into an arraylist for easier access

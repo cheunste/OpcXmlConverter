@@ -1,1 +1,3 @@
-OpcXmlConverter.exe "SCRAB" "DatosConfiguracion_SCRAB.xml" "write"
+cd /d "D:\Program Files\IBERINCO\WindAGCPF\OPCXML"
+OpcXmlConverter.exe "LEMPS" "../DatosConfiguracion_LEMPS.xml" "write"
+
