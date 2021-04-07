@@ -11,15 +11,43 @@ This is designed with Wind Node in mind.
 - The tagMap.csv file in the same directory as the exe. This is included by default. More on this [the tagmap section](#TagMap)
 
 # How to Install
+1. Verify that .NET 4.7.1 is installed on the server
+2. Grab a copy of the folder OpcXML from the nasshare in (\_Installs_CORE\OpcXML) and put it in the AGC folder on the server
+3. Modify the opcXML.bat file and modify the line:
+   **OpcXmlConverter.exe "[SITE PREFIX]" "[FULL PATH TO XML]" "read"**
+   - Change the "[SITE PREFIX]" to the site prefix with quotes. For example, if your site is Junca, replace [site Name] with "JUNCA"
+   - Change the "[FULL PATH TO XML]" to the path of the XML along with the file extention. This is typically the absolute path in the form "D:\XXXXXXXXXX\XXXXXXXXX\WINDAGC\DatosConfiguracion_XXXXXXXXX.xml"
+   - For servers that have multiple AGCs, you need to copy and paste the command line with different prefixes and paths to XML
+4. Install the OPC tags on a server.
+   - Log onto the Gepora server
+   - Grab a copy of the spreadsheet WF_AGC_DEF_rev1 from another site (doesn't matter which) and import it to a new site
+   - Export the AGCDEF tags from Gepora
+   - Load the tags to the new server
+5. Install the AgcDef.pvb file on the server
+   - grab a copy of the AgcDef.pvb file. This can be found in the UCC folder. Copying the UCC folder to the destination server is optional
+   - Put it in the project's P/ folder
+   - In the PVB, verify the filepath in the strLink variable. This is needed in case the AGC folder is using an old path naming convention (WindAGCPF vs WindAGC) different or if there are multiple sites on a UCC (see big horn)
+   - Update the existing Redundancia.pvb file with the reference to the AgcDef.pvb by adding the following
+   ```BASIC
+    IntVal = PROGRAM("PRELOAD","AgcDef.pvb", "");
+    PRINT("AGC Default");
+   ```
+6. Modify the existing EVENT.dat file
 
-1) Verify that .NET 4.7.1 is installed on the server
-2) Grab a copy of the folder OpcXML from the nasshare  in (_CORE\OpcXML) and put it in the AGC folder on the server (technically, this can be run anywhere on the server)
-3) Modify the opcXML.bat file and modify the line:
-	**OpcXmlConverter.exe "[SITE PREFIX]" "[FULL PATH TO XML]" "read"**
-	i) Change the "[SITE PREFIX]" to the site prefix with quotes. For example, if your site is Junca, replace [site Name] with "JUNCA"
-	ii) Change the "[FULL PATH TO XML]" to the path of the XML along with the file extention.  This is typically in the form "D:\XXXXXXXXXX\XXXXXXXXX\WINDAGC\DatosConfiguracion_XXXXXXXXX.xml"
-	iii) For servers that have multiple AGCs, you need to copy and paste the command line with different prefixes and paths to XML
-4) Depending on the XML tags you want to read, you may need to modify the tagMap.csv file. See [the tagmap section](#TagMap) for more details
+   - Add the following line in the project's Event.dat file
+
+   ```BASIC
+   EVTPROG,AGC_DEF_XXXXX,"",0,0,"","","XXXXX.WF.AGCDEF.ReadDefaultSettings",2,1,"SYSTEM.HISTORICO.HABILITA","ALL>1","AgcDef.pvb","","ReadAgcDef",""
+   ```
+
+   - Replace the XXXXX with the site acronym (ie JUNCA). Note there are two "XXXXX" to replace in the above statement
+   - Note that The above will allow read events. Write events are not requested and are dangerous. However, in case a design change occurs and we decide to allow NCC to overwrite the default AGCXML, add the following
+
+   ```BASIC
+   EVTPROG,AGC_DEF_XXXXX,"",0,0,"","","XXXXX.WF.AGCDEF.WriteDefaultSettings",2,1,"SYSTEM.HISTORICO.HABILITA","ALL>1","AgcDef.pvb","","ReadAgcDef",""
+   ```
+
+7. Depending on the XML tags you want to read, you may need to modify the tagMap.csv file. See [the tagmap section](#TagMap) for more details
 
 # How to use
 
