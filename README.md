@@ -13,10 +13,12 @@ This is designed with Wind Node in mind.
 # How to Install
 1. Verify that .NET 4.7.1 is installed on the server
 2. Grab a copy of the folder OpcXML from the nasshare in (\_Installs_CORE\OpcXML) and put it in the AGC folder on the server
-3. Modify the opcXML.bat file and modify the line:
-   **OpcXmlConverter.exe "[SITE PREFIX]" "[FULL PATH TO XML]" "read"**
+3. Update the opcRead.bat file:
+   - Update the cd path if needed. This depends on the file path and whether it is **WindAGCPF** or **WindAGC**
+   - In the line **OpcXmlConverter.exe "[SITE PREFIX]" "[FULL PATH TO XML]" "read"**
    - Change the "[SITE PREFIX]" to the site prefix with quotes. For example, if your site is Junca, replace [site Name] with "JUNCA"
-   - Change the "[FULL PATH TO XML]" to the path of the XML along with the file extention. This is typically the absolute path in the form "D:\XXXXXXXXXX\XXXXXXXXX\WINDAGC\DatosConfiguracion_XXXXXXXXX.xml"
+   - Change the "[FULL PATH TO XML]" to the path of the XML along with the file extention. This is typically the relative path in the form "../DatosConfiguracion_XXXXXXXXX.xml".
+   - For servers that have multiple AGCs, you need to copy and paste the command line with different prefixes and paths to XML. See Big Horn for an example
    - For servers that have multiple AGCs, you need to copy and paste the command line with different prefixes and paths to XML
 4. Install the OPC tags on a server.
    - Log onto the Gepora server
